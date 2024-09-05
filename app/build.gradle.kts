@@ -1,5 +1,3 @@
-import com.android.build.api.dsl.Packaging
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -61,7 +59,7 @@ dependencies {
     implementation(libs.bundles.hilt)
     implementation(libs.bundles.dataStore)
 
-    kapt (libs.hilt.android.compiler)
+    kapt(libs.hilt.android.compiler)
 
 }
 kapt {

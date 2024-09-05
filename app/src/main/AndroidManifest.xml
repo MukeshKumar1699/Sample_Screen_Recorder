@@ -13,7 +13,7 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
 
     <application
@@ -29,7 +29,7 @@
         tools:targetApi="31">
 
         <service
-            android:name=".OverlayService"
+            android:name=".service.OverlayService"
             android:exported="true" />
 
         <activity

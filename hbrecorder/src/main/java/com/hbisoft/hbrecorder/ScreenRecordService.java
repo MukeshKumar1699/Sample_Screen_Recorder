@@ -112,7 +112,7 @@ public class ScreenRecordService extends Service {
                 //Pause Recording
                 if (intent.getAction().equals("pause")) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            pauseRecording();
+                        pauseRecording();
                     }
                 }
                 //Resume Recording
@@ -220,21 +220,36 @@ public class ScreenRecordService extends Service {
 
                         }
 
-                        Notification.Action action = new Notification.Action.Builder(
-                                Icon.createWithResource(this, android.R.drawable.presence_video_online),
-                                notificationButtonText,
-                                pendingIntent).build();
+                        Notification.Action action = new Notification.Action.Builder(Icon.createWithResource(this, android.R.drawable.presence_video_online), notificationButtonText, pendingIntent).build();
 
                         if (notificationSmallIcon != null) {
                             Bitmap bmp = BitmapFactory.decodeByteArray(notificationSmallIcon, 0, notificationSmallIcon.length);
                             //Modify notification badge
-                            notification = new Notification.Builder(getApplicationContext(), channelId).setOngoing(true).setSmallIcon(Icon.createWithBitmap(bmp)).setContentTitle(notificationTitle).setContentText(notificationDescription).addAction(action).build();
+                            notification = new Notification.Builder(getApplicationContext(), channelId)
+                                    .setOngoing(true)
+                                    .setSmallIcon(Icon.createWithBitmap(bmp))
+                                    .setContentTitle(notificationTitle)
+//                                    .setContentText(notificationDescription)
+//                                    .addAction(action)
+                                    .build();
 
                         } else if (notificationSmallVector != 0) {
-                            notification = new Notification.Builder(getApplicationContext(), channelId).setOngoing(true).setSmallIcon(notificationSmallVector).setContentTitle(notificationTitle).setContentText(notificationDescription).addAction(action).build();
+                            notification = new Notification.Builder(getApplicationContext(), channelId)
+                                    .setOngoing(true)
+                                    .setSmallIcon(notificationSmallVector)
+                                    .setContentTitle(notificationTitle)
+//                                    .setContentText(notificationDescription)
+//                                    .addAction(action)
+                                    .build();
                         } else {
                             //Modify notification badge
-                            notification = new Notification.Builder(getApplicationContext(), channelId).setOngoing(true).setSmallIcon(R.drawable.icon).setContentTitle(notificationTitle).setContentText(notificationDescription).addAction(action).build();
+                            notification = new Notification.Builder(getApplicationContext(), channelId)
+                                    .setOngoing(true)
+                                    .setSmallIcon(R.drawable.icon)
+                                    .setContentTitle(notificationTitle)
+//                                    .setContentText(notificationDescription)
+//                                    .addAction(action)
+                                    .build();
                         }
                         startFgs(101, notification);
                     }
@@ -348,7 +363,7 @@ public class ScreenRecordService extends Service {
 
     //Pause Recording
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void pauseRecording(){
+    private void pauseRecording() {
         mMediaRecorder.pause();
         ResultReceiver receiver = mIntent.getParcelableExtra(ScreenRecordService.BUNDLED_LISTENER);
         Bundle bundle = new Bundle();
@@ -360,7 +375,7 @@ public class ScreenRecordService extends Service {
 
     //Resume Recording
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void resumeRecording(){
+    private void resumeRecording() {
         mMediaRecorder.resume();
         ResultReceiver receiver = mIntent.getParcelableExtra(ScreenRecordService.BUNDLED_LISTENER);
         Bundle bundle = new Bundle();
@@ -545,7 +560,7 @@ public class ScreenRecordService extends Service {
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(outputFormatAsInt);
 
-        if (orientationHint != 400){
+        if (orientationHint != 400) {
             mMediaRecorder.setOrientationHint(orientationHint);
         }
 
@@ -571,11 +586,11 @@ public class ScreenRecordService extends Service {
                     receiver.send(Activity.RESULT_OK, bundle);
                 }
             }
-        }else{
-            if (outputFormat!=null){
+        } else {
+            if (outputFormat != null) {
                 filePath = path + "/" + name + getExtension(outputFormat);
                 fileName = name + getExtension(outputFormat);
-            }else {
+            } else {
                 filePath = path + "/" + name + ".mp4";
                 fileName = name + ".mp4";
             }
@@ -597,7 +612,7 @@ public class ScreenRecordService extends Service {
         }
 
         // Catch approaching file limit
-        if ( maxFileSize > NO_SPECIFIED_MAX_SIZE) {
+        if (maxFileSize > NO_SPECIFIED_MAX_SIZE) {
             mMediaRecorder.setMaxFileSize(maxFileSize); // in bytes
         }
 
@@ -615,7 +630,7 @@ public class ScreenRecordService extends Service {
     }
 
     private void startFgs(int notificationId, Notification notificaton) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(notificationId, notificaton, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION | ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(notificationId, notificaton, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
@@ -634,7 +649,7 @@ public class ScreenRecordService extends Service {
     }
 
     private void callOnComplete() {
-        if ( mIntent != null ) {
+        if (mIntent != null) {
             ResultReceiver receiver = mIntent.getParcelableExtra(ScreenRecordService.BUNDLED_LISTENER);
             Bundle bundle = new Bundle();
             bundle.putString(ON_COMPLETE_KEY, ON_COMPLETE);

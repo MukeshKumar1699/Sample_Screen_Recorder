@@ -13,7 +13,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.samplescreenrecorder.OverlayService
+import com.example.samplescreenrecorder.service.OverlayService
 import com.example.samplescreenrecorder.R
 import com.example.samplescreenrecorder.helper.Helper.checkOverlayPermissionGranted
 import com.example.samplescreenrecorder.helper.Helper.checkPermissionsForAllAndroidVersions
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
 
             val overlayIntent = checkOverlayPermissionGranted(this)
-            if(overlayIntent != null) {
+            if (overlayIntent != null) {
                 overlayPermissionLauncher.launch(overlayIntent)
             } else {
                 // Permission already granted
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
                     if (viewModel.screenRecorderIsBusy()) {
                         viewModel.stopScreenRecording()
                         setFabIcon(true)
-                    }else {
+                    } else {
                         val permissionIntent = mediaProjectionManager.createScreenCaptureIntent()
                         screenRecordingLauncher.launch(permissionIntent)
                         setFabIcon(false)
@@ -76,7 +76,8 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp/")
         }
 
-        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        val uri =
+            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
         uri?.let {
             writeFileToUri(it)
         } ?: run {
@@ -116,9 +117,9 @@ class MainActivity : AppCompatActivity() {
 //                if (viewModel.screenRecorderIsBusy()) {
 //                    startOverlayService()
 //                }else {
-                    val permissionIntent = mediaProjectionManager.createScreenCaptureIntent()
-                    screenRecordingLauncher.launch(permissionIntent)
-                    setFabIcon(false)
+                val permissionIntent = mediaProjectionManager.createScreenCaptureIntent()
+                screenRecordingLauncher.launch(permissionIntent)
+                setFabIcon(false)
 //                }
             }
 
@@ -131,7 +132,7 @@ class MainActivity : AppCompatActivity() {
     private val screenRecordingLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
-        if ( result.resultCode == Activity.RESULT_OK) {
+        if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             startOverlayService(data, result.resultCode)
         }

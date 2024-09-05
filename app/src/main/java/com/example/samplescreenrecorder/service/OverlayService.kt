@@ -1,4 +1,4 @@
-package com.example.samplescreenrecorder
+package com.example.samplescreenrecorder.service
 
 import android.app.Service
 import android.content.Context
@@ -18,6 +18,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import com.example.samplescreenrecorder.HBRecorderListenerImpl
+import com.example.samplescreenrecorder.R
 import com.example.samplescreenrecorder.helper.HBRecorderHelper
 import com.example.samplescreenrecorder.helper.Helper
 import dagger.hilt.android.AndroidEntryPoint
@@ -101,10 +103,12 @@ class OverlayService : Service() {
                         windowManager.updateViewLayout(overlayView, params)
                         true
                     }
+
                     MotionEvent.ACTION_UP -> {
                         view.performClick()
                         true
                     }
+
                     else -> false
                 }
             }
@@ -152,7 +156,7 @@ class OverlayService : Service() {
             setOnClickListener {
                 hbRecorderHelper.stopScreenRecording()
 
-                if(!hbRecorderHelper.screenRecorderIsBusy()) {
+                if (!hbRecorderHelper.screenRecorderIsBusy()) {
                     //Update gallery depending on SDK Level
                     if (hbRecorderHelper.wasHbRecorderUriSet()) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -170,7 +174,8 @@ class OverlayService : Service() {
                 setPlayPauseIVVisible(false)
                 setStopIVVisiblity(false)
 
-                Toast.makeText(this@OverlayService, "stop Button Clicked", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@OverlayService, "stop Button Clicked", Toast.LENGTH_SHORT)
+                    .show()
 
                 stopSelf()
             }
@@ -197,17 +202,16 @@ class OverlayService : Service() {
     }
 
 
-
     private fun stopTimer() {
         timerHandler?.removeCallbacks(timerRunnable!!)
     }
 
     private fun setStopIVVisiblity(visible: Boolean) {
-        stopIV.visibility = if(visible) View.VISIBLE else View.GONE
+        stopIV.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     private fun setRecordIVVisible(visible: Boolean) {
-        recordIV.visibility = if(visible) View.VISIBLE else View.GONE
+        recordIV.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     private fun setPlayPauseIVVisible(visible: Boolean) {
@@ -215,13 +219,12 @@ class OverlayService : Service() {
     }
 
     private fun setPlayPauseIcon(isPlay: Boolean) {
-        if(isPlay) {
+        if (isPlay) {
             play_pause_IV.setImageResource(R.drawable.play)
-        }else {
+        } else {
             play_pause_IV.setImageResource(R.drawable.pause)
         }
     }
-
 
 
     override fun onCreate() {

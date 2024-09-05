@@ -4,10 +4,6 @@ import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
 import android.media.projection.MediaProjectionManager
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.samplescreenrecorder.HBRecorderListenerImpl
 import com.example.samplescreenrecorder.helper.HBRecorderHelper
 import com.hbisoft.hbrecorder.HBRecorder
@@ -17,32 +13,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Named
 import javax.inject.Singleton
-
-/*
-@Module
-@InstallIn(ActivityComponent::class)
-abstract class HBRRecorderModule {
-
-    @ActivityScoped
-    @Binds
-    abstract fun bindHBRecorderListener(
-        hbRecorderListenerImpl: HBRecorderListenerImpl
-    ): HBRecorderListener
-
-    companion object {
-        @ActivityScoped
-        @Provides
-        fun provideHBRecorder(
-            @ActivityContext context: Context,
-            listener: HBRecorderListener
-        ): HBRecorder {
-            return HBRecorder(context, listener)
-        }
-    }
-
-}*/
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -50,7 +21,7 @@ object HBRecorderModule {
 
     @Provides
     fun provideHBRecorderListener(hbRecorderListenerImpl: HBRecorderListenerImpl): HBRecorderListener {
-      return hbRecorderListenerImpl
+        return hbRecorderListenerImpl
     }
 
     @Provides
@@ -64,7 +35,12 @@ object HBRecorderModule {
 
     @Provides
     @Singleton
-    fun provideHBRecorderHelper(context: Context, hbRecorder: HBRecorder, contentValues: ContentValues, contentResolver: ContentResolver): HBRecorderHelper {
+    fun provideHBRecorderHelper(
+        context: Context,
+        hbRecorder: HBRecorder,
+        contentValues: ContentValues,
+        contentResolver: ContentResolver
+    ): HBRecorderHelper {
         return HBRecorderHelper(context, hbRecorder, contentResolver, contentValues)
     }
 
@@ -74,24 +50,6 @@ object HBRecorderModule {
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    private const val PREFERENCES_NAME = "my_preferences"
-
-    @Provides
-    @Singleton
-    @Named("pref_name")// name in case of conflict
-    fun providePreferenceName(): String = PREFERENCES_NAME
-
-    @Provides
-    @Singleton
-    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
-       PreferenceDataStoreFactory.create(
-
-           produceFile = {
-               context.preferencesDataStoreFile(PREFERENCES_NAME)
-           }
-
-       )
 
     @Provides
     fun provideContext(

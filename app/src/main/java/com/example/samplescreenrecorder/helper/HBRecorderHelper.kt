@@ -26,7 +26,7 @@ class HBRecorderHelper @Inject constructor(
     private val hbRecorder: HBRecorder,
     private val resolver: ContentResolver,
     private val contentValues: ContentValues
-){
+) {
 
     private var mUri: Uri? = null
 
@@ -107,7 +107,7 @@ class HBRecorderHelper @Inject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 
 
-            contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + "HBRecorder")
+            contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + "Ride Scan")
             contentValues.put(MediaStore.Video.Media.TITLE, filename)
             contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
             contentValues.put(
@@ -126,7 +126,7 @@ class HBRecorderHelper @Inject constructor(
             createFolder()
             hbRecorder.setOutputPath(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-                    .toString() + "/HBRecorder"
+                    .toString() + "/Ride Scan"
             )
         }
     }
@@ -155,7 +155,7 @@ class HBRecorderHelper @Inject constructor(
     private fun createFolder() {
         val f1 = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
-            "HBRecorder"
+            "Ride Scan"
         )
         if (!f1.exists()) {
             if (f1.mkdirs()) {
