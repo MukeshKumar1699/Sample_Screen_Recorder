@@ -5,6 +5,7 @@ import com.hbisoft.hbrecorder.HBRecorderListener
 import javax.inject.Inject
 
 class HBRecorderListenerImpl @Inject constructor() : HBRecorderListener {
+
     override fun HBRecorderOnStart() {
         Log.e("HBRecorder", "HBRecorderOnStart called")
     }

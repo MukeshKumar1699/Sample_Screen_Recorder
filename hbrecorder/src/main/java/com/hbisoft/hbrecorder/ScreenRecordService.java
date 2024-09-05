@@ -112,7 +112,7 @@ public class ScreenRecordService extends Service {
                 //Pause Recording
                 if (intent.getAction().equals("pause")) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        pauseRecording();
+                            pauseRecording();
                     }
                 }
                 //Resume Recording

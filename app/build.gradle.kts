@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -36,7 +38,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    packagingOptions {
+    fun Packaging.() {
         resources {
             excludes += ("/META-INF/{AL2.0,LGPL2.1}")
         }
@@ -52,6 +54,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.datastore.core.android)
     implementation(libs.androidx.datastore.preferences.core.jvm)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,7 +65,7 @@ dependencies {
     implementation(libs.bundles.hilt)
     implementation(libs.bundles.dataStore)
 
-    kapt ("com.google.dagger:hilt-android-compiler:2.52")
+    kapt (libs.hilt.android.compiler)
 
 }
 kapt {

@@ -1,4 +1,4 @@
-package com.example.samplescreenrecorder
+package com.example.samplescreenrecorder.repo
 
 interface OperationRepository {
 

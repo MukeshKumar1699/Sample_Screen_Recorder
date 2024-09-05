@@ -1,10 +1,10 @@
-package com.example.samplescreenrecorder
+package com.example.samplescreenrecorder.helper
 
 object Const {
 
-    val SCREEN_RECORD_REQUEST_CODE: Int = 777
     val PERMISSION_REQ_ID_RECORD_AUDIO: Int = 22
     val PERMISSION_REQ_POST_NOTIFICATIONS: Int = 33
     val PERMISSION_REQ_ID_WRITE_EXTERNAL_STORAGE: Int = PERMISSION_REQ_ID_RECORD_AUDIO + 1
+
 
 }

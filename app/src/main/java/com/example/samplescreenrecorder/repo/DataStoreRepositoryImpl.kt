@@ -1,4 +1,4 @@
-package com.example.samplescreenrecorder
+package com.example.samplescreenrecorder.repo
 
 import android.util.Log
 import androidx.datastore.core.DataStore

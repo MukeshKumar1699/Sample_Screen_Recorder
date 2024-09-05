@@ -7,7 +7,7 @@
     <application
         tools:targetApi="q">
 
-        <service android:name="com.hbisoft.hbrecorder.ScreenRecordService"
+       <service android:name= "com.hbisoft.hbrecorder.ScreenRecordService"
             android:foregroundServiceType="mediaProjection|microphone"
             tools:targetApi="q" />
 

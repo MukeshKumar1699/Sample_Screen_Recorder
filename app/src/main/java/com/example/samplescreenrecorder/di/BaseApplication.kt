@@ -1,4 +1,4 @@
-package com.example.samplescreenrecorder
+package com.example.samplescreenrecorder.di
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
