@@ -1,9 +1,12 @@
 package com.example.samplescreenrecorder.ui
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -37,6 +40,9 @@ class MainActivity : AppCompatActivity() {
         fab = findViewById(R.id.fab)
         setOnClickListeners()
 
+        // Start file creation intent
+        requestWriteAccess()
+
     }
 
     private fun setOnClickListeners() {
@@ -60,6 +66,30 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun requestWriteAccess() {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Video.Media.DISPLAY_NAME, "new_image.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp/")
+        }
+
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        uri?.let {
+            writeFileToUri(it)
+        } ?: run {
+            // Handle error
+        }
+    }
+
+    private fun writeFileToUri(uri: Uri) {
+        contentResolver.openOutputStream(uri)?.use { outputStream ->
+            val data = "Your file content".toByteArray()
+            outputStream.write(data)
+        } ?: run {
+            // Handle error
         }
     }
 

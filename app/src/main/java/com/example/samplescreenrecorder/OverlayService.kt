@@ -116,10 +116,10 @@ class OverlayService : Service() {
                 hbRecorderHelper.startRecordingScreen(mResultData, mResultCode)
 
                 // Start the timer
-                startTimer()
                 setRecordIVVisible(false)
                 setPlayPauseIVVisible(true)
                 setStopIVVisiblity(true)
+                startTimer()
                 Toast.makeText(this@OverlayService, "record Clicked", Toast.LENGTH_SHORT).show()
             }
         }
