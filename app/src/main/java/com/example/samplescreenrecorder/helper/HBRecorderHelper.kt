@@ -58,23 +58,8 @@ class HBRecorderHelper @Inject constructor(
 
     }
 
-
-    //Get/Set the selected settings
-    private fun quickSettings() {
-        hbRecorder.setAudioBitrate(128000)
-        hbRecorder.setAudioSamplingRate(44100)
-        hbRecorder.recordHDVideo(true)
-        hbRecorder.setAudioEnable(true)
-        //Customise Notification
-//        hbRecorder.setNotificationSmallIcon(R.drawable.ic_launcher_foreground)
-        //hbRecorder.setNotificationSmallIconVector(R.drawable.ic_baseline_videocam_24);
-        hbRecorder.setNotificationTitle("Recording your Screen")
-        hbRecorder.setNotificationDescription("Drag down to Stop Recording")
-    }
-
     fun startRecordingScreen(data: Intent?, resultCode: Int) {
 
-        quickSettings()
         //Set file path or Uri depending on SDK version
         setOutputPath()
         //Start screen recording

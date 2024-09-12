@@ -1,5 +1,6 @@
 package com.example.samplescreenrecorder.service
 
+import android.Manifest
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -116,21 +117,21 @@ class OverlayService : Service() {
                 }
             }
         }
-
-        recordIV.apply {
-
-            setOnClickListener {
-                hbRecorderHelper.startRecordingScreen(mResultData, mResultCode)
-
-                // Start the timer
-                setRecordIVVisible(false)
-                setPlayPauseIVVisible(true)
-                setStopIVVisiblity(true)
-                startTimer()
-                Toast.makeText(this@OverlayService, "record Clicked", Toast.LENGTH_SHORT).show()
-            }
-        }
-
+//
+//        recordIV.apply {
+//
+//            setOnClickListener {
+//                hbRecorderHelper.startRecordingScreen(mResultData, mResultCode)
+//
+//                // Start the timer
+//                setRecordIVVisible(false)
+//                setPlayPauseIVVisible(true)
+//                setStopIVVisiblity(true)
+//                startTimer()
+//                Toast.makeText(this@OverlayService, "record Clicked", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//
 //        play_pause_IV.apply {
 //
 //            setOnClickListener {
@@ -185,6 +186,8 @@ class OverlayService : Service() {
         }
 
         windowManager.addView(overlayView, params)
+
+        hbRecorderHelper.setAudioEnable(checkAudioPermissionGranted(this))
         hbRecorderHelper.startRecordingScreen(mResultData, mResultCode)
         startTimer()
 

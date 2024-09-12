@@ -109,28 +109,6 @@ public class ScreenRecordService extends Service {
                 else if (intent.getAction().equals("resume")) {
                     resumeRecording();
                 }
-
-                //Record Audio
-                else if (intent.getAction().equals("enable_audio")) {
-                    isAudioEnabled = true;
-                    try {
-                        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-                        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-                        mMediaRecorder.setAudioEncodingBitRate(128000);
-                        mMediaRecorder.setAudioSamplingRate(44100);
-                        mMediaRecorder.prepare();
-                        Log.d(TAG, "Audio recording enabled.");
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error enabling audio: " + Log.getStackTraceString(e));
-                        ResultReceiver receiver = intent.getParcelableExtra(ScreenRecordService.BUNDLED_LISTENER);
-                        Bundle bundle = new Bundle();
-                        bundle.putInt(ERROR_KEY, SETTINGS_ERROR);
-                        bundle.putString(ERROR_REASON_KEY, Log.getStackTraceString(e));
-                        if (receiver != null) {
-                            receiver.send(Activity.RESULT_OK, bundle);
-                        }
-                    }
-                }
             }
             //Start Recording
             else {
@@ -369,23 +347,24 @@ public class ScreenRecordService extends Service {
             mMediaRecorder.setOrientationHint(orientationHint);
         }
 
+
         // Configure MediaRecorder
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
 
+        // Configure audio settings if audio is enabled
+        if (isAudioEnabled) {
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+            mMediaRecorder.setAudioEncodingBitRate(128000);
+            mMediaRecorder.setAudioSamplingRate(44100);
+        }
+
         // Set video properties
         mMediaRecorder.setVideoSize(mScreenWidth, mScreenHeight);
         mMediaRecorder.setVideoEncodingBitRate(5 * mScreenWidth * mScreenHeight);
         mMediaRecorder.setVideoFrameRate(60);
-
-        // Configure audio settings if audio is enabled
-        if (isAudioEnabled) {
-            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-            mMediaRecorder.setAudioEncodingBitRate(128000);
-            mMediaRecorder.setAudioSamplingRate(44100);
-        }
 
         // Set output file
         if (returnedUri != null) {
