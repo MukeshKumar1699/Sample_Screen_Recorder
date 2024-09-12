@@ -29,7 +29,11 @@ object Helper {
         return true
     }
 
-    fun checkPermissionsForAllAndroidVersions(context: Activity): Boolean {
+    fun checkAudioPermissionGranted(context: Context): Boolean {
+            return ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    }
+
+    fun checkPermissionsForNotificationAndAudio(context: Activity): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(
                     context,

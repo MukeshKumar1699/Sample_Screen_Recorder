@@ -64,7 +64,7 @@ class HBRecorderHelper @Inject constructor(
         hbRecorder.setAudioBitrate(128000)
         hbRecorder.setAudioSamplingRate(44100)
         hbRecorder.recordHDVideo(true)
-        hbRecorder.isAudioEnabled(true)
+        hbRecorder.setAudioEnable(true)
         //Customise Notification
 //        hbRecorder.setNotificationSmallIcon(R.drawable.ic_launcher_foreground)
         //hbRecorder.setNotificationSmallIconVector(R.drawable.ic_baseline_videocam_24);
@@ -90,6 +90,18 @@ class HBRecorderHelper @Inject constructor(
         hbRecorder.stopScreenRecording()
     }
 
+    fun isAudioRecordingEnabled(): Boolean {
+        return hbRecorder.isAudioEnabled
+    }
+
+    fun setAudioEnable(enable: Boolean) {
+        hbRecorder.setAudioEnable(enable)
+    }
+
+    fun startAudioRecording() {
+        hbRecorder.startAudioRecording()
+    }
+
     fun pauseScreenRecording() {
         hbRecorder.pauseScreenRecording()
     }
@@ -102,34 +114,30 @@ class HBRecorderHelper @Inject constructor(
         hbRecorder.resumeScreenRecording()
     }
 
-    private fun setOutputPath() {
-        val filename: String = generateFileName()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+private fun setOutputPath() {
+    val filename: String = generateFileName()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + "Ride Scan")
+        contentValues.put(MediaStore.Video.Media.TITLE, filename)
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, getMimeTypeForOutputFormat("DEFAULT"))
+        contentValues.put(MediaStore.Video.Media.IS_PENDING, 1) // Mark as pending
 
+        mUri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
 
-            contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + "Ride Scan")
-            contentValues.put(MediaStore.Video.Media.TITLE, filename)
-            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-            contentValues.put(
-                MediaStore.MediaColumns.MIME_TYPE,
-                getMimeTypeForOutputFormat("DEFAULT")
-            )
-
-            mUri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-            mUri?.let {
-                //FILE NAME SHOULD BE THE SAME
-                hbRecorder.fileName = filename
-                hbRecorder.setOutputUri(mUri)
-            }
-        } else {
-            createFolder()
-            hbRecorder.setOutputPath(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-                    .toString() + "/Ride Scan"
-            )
+        mUri?.let {
+            //FILE NAME SHOULD BE THE SAME
+            hbRecorder.fileName = filename
+            hbRecorder.setOutputUri(mUri)
         }
+    } else {
+        createFolder()
+        hbRecorder.setOutputPath(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+                .toString() + "/Ride Scan"
+        )
     }
+}
 
     //Generate a timestamp to be used as a file name
     private fun generateFileName(): String {

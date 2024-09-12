@@ -19,8 +19,9 @@
 
         <ImageView
             android:id="@+id/record_IV"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:visibility="gone"
             android:layout_gravity="center"
             android:src="@drawable/record" />
 
@@ -29,8 +30,9 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
             android:src="@drawable/pause"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
 
         <ImageView
@@ -39,7 +41,16 @@
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:src="@drawable/stop"
-            android:visibility="gone" />
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/mic_IV"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:layout_gravity="center"
+            android:src="@drawable/off_mic"
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/timer_tv"

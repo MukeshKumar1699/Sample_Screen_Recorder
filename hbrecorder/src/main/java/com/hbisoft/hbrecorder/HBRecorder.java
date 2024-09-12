@@ -7,11 +7,9 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Environment;
 
 import androidx.annotation.DrawableRes;
@@ -162,8 +160,12 @@ public class HBRecorder implements MyListener {
     }
 
     /*Enable/Disable audio*/
-    public void isAudioEnabled(boolean bool) {
+    public void setAudioEnable(boolean bool) {
         this.isAudioEnabled = bool;
+    }
+
+    public Boolean isAudioEnabled() {
+        return isAudioEnabled;
     }
 
     /*Set Audio Source*/
@@ -255,8 +257,15 @@ public class HBRecorder implements MyListener {
         context.stopService(service);
     }
 
+    public void startAudioRecording() {
+        if (service != null){
+            isAudioEnabled = true;
+            service.setAction("enable_audio");
+            context.startService(service);
+        }
+    }
+
     /*Pause screen recording*/
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void pauseScreenRecording(){
         if (service != null){
             isPaused = true;

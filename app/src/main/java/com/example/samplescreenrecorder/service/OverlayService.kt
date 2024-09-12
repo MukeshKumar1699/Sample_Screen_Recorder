@@ -22,6 +22,7 @@ import com.example.samplescreenrecorder.HBRecorderListenerImpl
 import com.example.samplescreenrecorder.R
 import com.example.samplescreenrecorder.helper.HBRecorderHelper
 import com.example.samplescreenrecorder.helper.Helper
+import com.example.samplescreenrecorder.helper.Helper.checkAudioPermissionGranted
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -39,6 +40,7 @@ class OverlayService : Service() {
     private lateinit var recordIV: ImageView
     private lateinit var play_pause_IV: ImageView
     private lateinit var stopIV: ImageView
+    private lateinit var micIV: ImageView
     private lateinit var timerTV: TextView
 
     private lateinit var params: LayoutParams
@@ -70,6 +72,7 @@ class OverlayService : Service() {
         recordIV = overlayView.findViewById(R.id.record_IV)
         play_pause_IV = overlayView.findViewById(R.id.play_pause_IV)
         stopIV = overlayView.findViewById(R.id.stop_IV)
+        micIV = overlayView.findViewById(R.id.mic_IV)
         timerTV = overlayView.findViewById(R.id.timer_tv)
 
         params = LayoutParams(
@@ -182,6 +185,8 @@ class OverlayService : Service() {
         }
 
         windowManager.addView(overlayView, params)
+        hbRecorderHelper.startRecordingScreen(mResultData, mResultCode)
+        startTimer()
 
         return super.onStartCommand(intent, flags, startId)
     }
@@ -212,6 +217,10 @@ class OverlayService : Service() {
 
     private fun setRecordIVVisible(visible: Boolean) {
         recordIV.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    private fun setMicEnabledIcon() {
+        micIV.setImageResource(R.drawable.on_mic)
     }
 
     private fun setPlayPauseIVVisible(visible: Boolean) {
