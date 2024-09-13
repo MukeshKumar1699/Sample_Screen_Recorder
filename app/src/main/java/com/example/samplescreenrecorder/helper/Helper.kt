@@ -17,7 +17,10 @@ import java.util.Locale
 object PermissionHelper {
 
     fun checkAudioPermissionGranted(context: Context): Boolean {
-        return ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     fun checkOverlayPermissionGranted(context: Context): Intent? {
@@ -34,7 +37,10 @@ object PermissionHelper {
 
     // Helper function to check if a permission is granted
     private fun isPermissionGranted(context: Activity, permission: String): Boolean {
-        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(
+            context,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     // Helper function to request permissions
@@ -95,7 +101,10 @@ object PermissionHelper {
     }
 
     // Helper function to check if rationale should be shown
-    private fun shouldShowRequestPermissionRationale(context: Activity, permission: String): Boolean {
+    private fun shouldShowRequestPermissionRationale(
+        context: Activity,
+        permission: String
+    ): Boolean {
         return ActivityCompat.shouldShowRequestPermissionRationale(context, permission)
     }
 
@@ -153,7 +162,6 @@ object AppHelper {
             String.format(Locale.ROOT, "%02d:%02d", minutes, remainingSeconds)
         }
     }
-
 
 
 }

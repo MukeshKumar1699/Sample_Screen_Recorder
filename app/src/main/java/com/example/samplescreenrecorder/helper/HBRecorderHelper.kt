@@ -115,7 +115,10 @@ class HBRecorderHelper @Inject constructor(
                 put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/Ride Scan") // Folder path
                 put(MediaStore.Video.Media.TITLE, filename) // Video title
                 put(MediaStore.MediaColumns.DISPLAY_NAME, filename) // Display name
-                put(MediaStore.MediaColumns.MIME_TYPE, getMimeTypeForOutputFormat("DEFAULT")) // MIME type
+                put(
+                    MediaStore.MediaColumns.MIME_TYPE,
+                    getMimeTypeForOutputFormat("DEFAULT")
+                ) // MIME type
                 put(MediaStore.Video.Media.IS_PENDING, 1) // Mark file as pending
             }
 
@@ -131,13 +134,15 @@ class HBRecorderHelper @Inject constructor(
         } else {
             // For Android versions below Q, create the folder manually and set the output path
             createFolder() // Function that creates the folder if it doesn't exist
-            val outputPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-                .toString() + "/Ride Scan/$filename"
+            val outputPath =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+                    .toString() + "/Ride Scan/$filename"
 
             hbRecorder.setOutputPath(outputPath) // Set output path for HBRecorder
             filePathOrUri = outputPath // Store the file path for later use
         }
     }    // Ensure to call this after the recording is complete to make the file visible
+
     private fun finalizeRecording() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && mUri != null) {
             // Update IS_PENDING to 0 to make the file visible in MediaStore

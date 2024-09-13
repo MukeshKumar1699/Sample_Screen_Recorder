@@ -21,8 +21,8 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.samplescreenrecorder.HBRecorderListenerImpl
 import com.example.samplescreenrecorder.R
-import com.example.samplescreenrecorder.helper.HBRecorderHelper
 import com.example.samplescreenrecorder.helper.AppHelper
+import com.example.samplescreenrecorder.helper.HBRecorderHelper
 import com.example.samplescreenrecorder.helper.PermissionHelper.checkAudioPermissionGranted
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -158,9 +158,9 @@ class OverlayService : Service() {
 //        }
 
         micIV.apply {
-            if(isAudioEnalbed) {
+            if (isAudioEnalbed) {
                 micIV.setImageResource(R.drawable.on_mic)
-            }else {
+            } else {
                 micIV.setImageResource(R.drawable.off_mic)
             }
         }
@@ -228,6 +228,7 @@ class OverlayService : Service() {
                             .show()
                     }
                 }
+
                 is String -> {
                     // For Android versions below Q (File path case)
                     val file = File(it)

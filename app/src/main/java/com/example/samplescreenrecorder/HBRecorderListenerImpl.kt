@@ -20,7 +20,11 @@ class HBRecorderListenerImpl @Inject constructor(val context: Context) : HBRecor
 
     override fun HBRecorderOnError(errorCode: Int, reason: String?) {
         Log.e("HBRecorderOnError", reason!!)
-        Toast.makeText(context, "Error recording your screen errorCode: $errorCode", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            context,
+            "Error recording your screen errorCode: $errorCode",
+            Toast.LENGTH_SHORT
+        ).show()
         val intent = Intent(context, OverlayService::class.java)
         context.stopService(intent)
     }
