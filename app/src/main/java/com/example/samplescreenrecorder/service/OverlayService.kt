@@ -22,8 +22,8 @@ import androidx.annotation.RequiresApi
 import com.example.samplescreenrecorder.HBRecorderListenerImpl
 import com.example.samplescreenrecorder.R
 import com.example.samplescreenrecorder.helper.HBRecorderHelper
-import com.example.samplescreenrecorder.helper.Helper
-import com.example.samplescreenrecorder.helper.Helper.checkAudioPermissionGranted
+import com.example.samplescreenrecorder.helper.AppHelper
+import com.example.samplescreenrecorder.helper.PermissionHelper.checkAudioPermissionGranted
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import javax.inject.Inject
@@ -54,7 +54,7 @@ class OverlayService : Service() {
 
     private var mResultCode = 0
     private var mResultData: Intent? = null
-
+    private var isAudioEnalbed: Boolean = false
     private var timerHandler: Handler? = null
     private var timerRunnable: Runnable? = null
     private var elapsedTime = 0 // Elapsed time in seconds
@@ -64,6 +64,7 @@ class OverlayService : Service() {
 
         mResultCode = intent!!.getIntExtra("code", -1)
         mResultData = intent.getParcelableExtra("data")
+        isAudioEnalbed = checkAudioPermissionGranted(this)
 
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
@@ -155,6 +156,14 @@ class OverlayService : Service() {
 //            }
 //
 //        }
+
+        micIV.apply {
+            if(isAudioEnalbed) {
+                micIV.setImageResource(R.drawable.on_mic)
+            }else {
+                micIV.setImageResource(R.drawable.off_mic)
+            }
+        }
 
         stopIV.apply {
             setOnClickListener {
@@ -256,7 +265,7 @@ class OverlayService : Service() {
         timerRunnable = object : Runnable {
             override fun run() {
                 elapsedTime++
-                timerTV.text = Helper.formatElapsedTime(elapsedTime)
+                timerTV.text = AppHelper.formatElapsedTime(elapsedTime)
                 timerHandler?.postDelayed(this, 1000) // Update every second
             }
         }
@@ -269,18 +278,6 @@ class OverlayService : Service() {
         timerHandler?.removeCallbacks(timerRunnable!!)
     }
 
-    private fun setStopIVVisiblity(visible: Boolean) {
-        stopIV.visibility = if (visible) View.VISIBLE else View.GONE
-    }
-
-    private fun setRecordIVVisible(visible: Boolean) {
-        recordIV.visibility = if (visible) View.VISIBLE else View.GONE
-    }
-
-    private fun setMicEnabledIcon() {
-        micIV.setImageResource(R.drawable.on_mic)
-    }
-
     private fun setPlayPauseIVVisible(visible: Boolean) {
 //        play_pause_IV.visibility = if(visible) View.VISIBLE else View.GONE
     }
@@ -291,14 +288,6 @@ class OverlayService : Service() {
         } else {
             play_pause_IV.setImageResource(R.drawable.pause)
         }
-    }
-
-
-    override fun onCreate() {
-        super.onCreate()
-
-        Toast.makeText(this, "Overlay Service created", Toast.LENGTH_SHORT).show()
-
     }
 
     override fun onDestroy() {

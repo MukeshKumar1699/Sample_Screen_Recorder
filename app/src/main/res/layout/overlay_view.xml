@@ -32,7 +32,7 @@
             android:layout_gravity="center"
             android:layout_marginEnd="10dp"
             android:src="@drawable/pause"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
 
         <ImageView
@@ -47,6 +47,7 @@
             android:id="@+id/mic_IV"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:clickable="false"
             android:layout_marginStart="10dp"
             android:layout_gravity="center"
             android:src="@drawable/off_mic"
@@ -56,6 +57,7 @@
             android:id="@+id/timer_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="false"
             android:layout_gravity="center"
             android:layout_marginStart="10dp"
             android:text="00:00"

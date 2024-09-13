@@ -3,6 +3,7 @@ package com.example.samplescreenrecorder.ui
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
 import android.provider.Settings
@@ -11,8 +12,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.samplescreenrecorder.R
-import com.example.samplescreenrecorder.helper.Helper.checkOverlayPermissionGranted
-import com.example.samplescreenrecorder.helper.Helper.checkPermissionsForNotificationAndAudio
+import com.example.samplescreenrecorder.helper.Const.REQUEST_CODE
+import com.example.samplescreenrecorder.helper.PermissionHelper.checkOverlayPermissionGranted
+import com.example.samplescreenrecorder.helper.PermissionHelper.checkPermissionsForAll
 import com.example.samplescreenrecorder.service.OverlayService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,16 +40,13 @@ class MainActivity : AppCompatActivity() {
     private fun setOnClickListeners() {
         fab.setOnClickListener {
 
-            if (isServiceRunning(OverlayService::class.java)) {
-                Toast.makeText(this, "Overlay service is already running", Toast.LENGTH_SHORT).show()
-            } else {
+            if (!isServiceRunning(OverlayService::class.java)) {
                 val overlayIntent = checkOverlayPermissionGranted(this)
                 if (overlayIntent != null) {
                     overlayPermissionLauncher.launch(overlayIntent)
                 } else {
                     // Permission already granted
-                    if (checkPermissionsForNotificationAndAudio(this)) {
-
+                    if (checkPermissionsForAll(this)) {
                         val permissionIntent = mediaProjectionManager.createScreenCaptureIntent()
                         screenRecordingLauncher.launch(permissionIntent)
                     }
@@ -84,7 +83,7 @@ class MainActivity : AppCompatActivity() {
     ) { result: ActivityResult ->
         if (Settings.canDrawOverlays(this)) {
             // Permission granted
-            if (checkPermissionsForNotificationAndAudio(this)) {
+            if (checkPermissionsForAll(this)) {
                 val permissionIntent = mediaProjectionManager.createScreenCaptureIntent()
                 screenRecordingLauncher.launch(permissionIntent)
             }
@@ -103,5 +102,23 @@ class MainActivity : AppCompatActivity() {
             startOverlayService(data, result.resultCode)
         }
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE) {
+            // Handle the result of the permission request
+            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                // Permissions granted
+            } else {
+                // Permissions denied
+                // Handle accordingly, maybe show a message or disable functionality
+            }
+        }
+    }
+
 
 }
