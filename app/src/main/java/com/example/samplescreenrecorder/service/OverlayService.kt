@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -24,6 +25,7 @@ import com.example.samplescreenrecorder.helper.HBRecorderHelper
 import com.example.samplescreenrecorder.helper.Helper
 import com.example.samplescreenrecorder.helper.Helper.checkAudioPermissionGranted
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -155,30 +157,32 @@ class OverlayService : Service() {
 //        }
 
         stopIV.apply {
-
             setOnClickListener {
                 hbRecorderHelper.stopScreenRecording()
 
                 if (!hbRecorderHelper.screenRecorderIsBusy()) {
-                    //Update gallery depending on SDK Level
+                    // Update gallery depending on SDK Level
                     if (hbRecorderHelper.wasHbRecorderUriSet()) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            // Call updateGalleryUri for Android 10 and above
                             hbRecorderHelper.updateGalleryUri()
                         } else {
+                            // Call refreshGalleryFile for Android versions below Q
                             hbRecorderHelper.refreshGalleryFile()
                         }
                     } else {
-                        hbRecorderHelper.refreshGalleryFile()
+                        // Handle case where URI was not set
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                            hbRecorderHelper.refreshGalleryFile()
+                        }
                     }
                 }
 
                 stopTimer()
-                setRecordIVVisible(true)
-                setPlayPauseIVVisible(false)
-                setStopIVVisiblity(false)
+                Toast.makeText(this@OverlayService, "Recording Stopped", Toast.LENGTH_SHORT).show()
 
-                Toast.makeText(this@OverlayService, "stop Button Clicked", Toast.LENGTH_SHORT)
-                    .show()
+                openFileLocator()
+
 
                 stopSelf()
             }
@@ -191,6 +195,58 @@ class OverlayService : Service() {
         startTimer()
 
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    // Open the recorded file after recording is finished
+    private fun openFileLocator() {
+
+        // Get the path to the recorded video file
+        val filePathOrUri = hbRecorderHelper.getFilePathOrUri()
+
+        filePathOrUri?.let {
+            when (it) {
+                is Uri -> {
+                    // For Android 10 and above (URI case)
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(it, "video/*")
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // Grant read permission for URI
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Required for launching activity from Service
+                    }
+                    if (intent.resolveActivity(packageManager) != null) {
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(this, "No app found to open the file", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+                is String -> {
+                    // For Android versions below Q (File path case)
+                    val file = File(it)
+                    val uri = Uri.fromFile(file) // Convert file path to URI
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(uri, "video/*")
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // Grant read permission for URI
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Required for launching activity from Service
+                    }
+                    if (intent.resolveActivity(packageManager) != null) {
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(this, "No app found to open the file", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
+                else -> {
+                    Toast.makeText(this, "Invalid file or URI", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } ?: Toast.makeText(
+            this@OverlayService,
+            "Please open any file explorer and open the Ride folder",
+            Toast.LENGTH_SHORT
+        ).show()
+
+
     }
 
     private fun startTimer() {

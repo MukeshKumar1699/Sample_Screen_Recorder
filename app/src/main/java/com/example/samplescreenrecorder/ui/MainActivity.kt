@@ -9,13 +9,11 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.samplescreenrecorder.R
 import com.example.samplescreenrecorder.helper.Helper.checkOverlayPermissionGranted
 import com.example.samplescreenrecorder.helper.Helper.checkPermissionsForNotificationAndAudio
 import com.example.samplescreenrecorder.service.OverlayService
-import com.example.samplescreenrecorder.viewmodel.MainViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -27,9 +25,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var mediaProjectionManager: MediaProjectionManager
 
     private lateinit var fab: FloatingActionButton
-
-    private val viewModel: MainViewModel by viewModels()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,27 +46,15 @@ class MainActivity : AppCompatActivity() {
                     overlayPermissionLauncher.launch(overlayIntent)
                 } else {
                     // Permission already granted
-
                     if (checkPermissionsForNotificationAndAudio(this)) {
 
-                        if (viewModel.screenRecorderIsBusy()) {
-                            viewModel.stopScreenRecording()
-                            setFabIcon(true)
-                        } else {
-                            val permissionIntent = mediaProjectionManager.createScreenCaptureIntent()
-                            screenRecordingLauncher.launch(permissionIntent)
-                            setFabIcon(false)
-                        }
+                        val permissionIntent = mediaProjectionManager.createScreenCaptureIntent()
+                        screenRecordingLauncher.launch(permissionIntent)
                     }
                 }
             }
         }
     }
-
-    private fun setFabIcon(showPlayIcon: Boolean) {
-        if (showPlayIcon) fab.setImageResource(R.drawable.play) else fab.setImageResource(R.drawable.stop)
-    }
-
 
     private fun startOverlayService(data: Intent?, resultCode: Int) {
 
@@ -101,12 +84,9 @@ class MainActivity : AppCompatActivity() {
     ) { result: ActivityResult ->
         if (Settings.canDrawOverlays(this)) {
             // Permission granted
-
             if (checkPermissionsForNotificationAndAudio(this)) {
-
                 val permissionIntent = mediaProjectionManager.createScreenCaptureIntent()
                 screenRecordingLauncher.launch(permissionIntent)
-                setFabIcon(false)
             }
 
         } else {

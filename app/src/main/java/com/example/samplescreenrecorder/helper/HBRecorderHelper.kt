@@ -29,9 +29,15 @@ class HBRecorderHelper @Inject constructor(
 ) {
 
     private var mUri: Uri? = null
+    private var filePathOrUri: Any? = null // This will hold either a String (file path) or Uri
+
 
     fun wasHbRecorderUriSet(): Boolean {
         return hbRecorder.wasUriSet()
+    }
+
+    fun getFilePathOrUri(): Any? {
+        return filePathOrUri
     }
 
     fun setUpHbRecorderCodecInfo() {
@@ -73,6 +79,7 @@ class HBRecorderHelper @Inject constructor(
 
     fun stopScreenRecording() {
         hbRecorder.stopScreenRecording()
+        finalizeRecording()
     }
 
     fun isAudioRecordingEnabled(): Boolean {
@@ -99,30 +106,48 @@ class HBRecorderHelper @Inject constructor(
         hbRecorder.resumeScreenRecording()
     }
 
-private fun setOutputPath() {
-    val filename: String = generateFileName()
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + "Ride Scan")
-        contentValues.put(MediaStore.Video.Media.TITLE, filename)
-        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, getMimeTypeForOutputFormat("DEFAULT"))
-        contentValues.put(MediaStore.Video.Media.IS_PENDING, 1) // Mark as pending
+    private fun setOutputPath() {
+        val filename: String = generateFileName() // Generate a unique file name
 
-        mUri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Use MediaStore for Android 10 (Q) and above
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/Ride Scan") // Folder path
+                put(MediaStore.Video.Media.TITLE, filename) // Video title
+                put(MediaStore.MediaColumns.DISPLAY_NAME, filename) // Display name
+                put(MediaStore.MediaColumns.MIME_TYPE, getMimeTypeForOutputFormat("DEFAULT")) // MIME type
+                put(MediaStore.Video.Media.IS_PENDING, 1) // Mark file as pending
+            }
 
-        mUri?.let {
-            //FILE NAME SHOULD BE THE SAME
-            hbRecorder.fileName = filename
-            hbRecorder.setOutputUri(mUri)
+            // Insert the new video into MediaStore
+            mUri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+            mUri?.let {
+                // Assign filename and URI to HBRecorder
+                hbRecorder.fileName = filename
+                hbRecorder.setOutputUri(mUri)
+                filePathOrUri = mUri // Store the URI for later use
+            }
+        } else {
+            // For Android versions below Q, create the folder manually and set the output path
+            createFolder() // Function that creates the folder if it doesn't exist
+            val outputPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+                .toString() + "/Ride Scan/$filename"
+
+            hbRecorder.setOutputPath(outputPath) // Set output path for HBRecorder
+            filePathOrUri = outputPath // Store the file path for later use
         }
-    } else {
-        createFolder()
-        hbRecorder.setOutputPath(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-                .toString() + "/Ride Scan"
-        )
+    }    // Ensure to call this after the recording is complete to make the file visible
+    private fun finalizeRecording() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && mUri != null) {
+            // Update IS_PENDING to 0 to make the file visible in MediaStore
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Video.Media.IS_PENDING, 0)
+            }
+            resolver.update(mUri!!, contentValues, null, null)
+        }
     }
-}
+
 
     //Generate a timestamp to be used as a file name
     private fun generateFileName(): String {
