@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun startOverlayService(data: Intent?, resultCode: Int) { val overlayService = Intent(this, OverlayService::class.java)
+    private fun startOverlayService(data: Intent?, resultCode: Int) {
 
         if (!isServiceRunning(OverlayService::class.java)) {
             val overlayService = Intent(this, OverlayService::class.java)

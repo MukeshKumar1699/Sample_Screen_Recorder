@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -22,8 +21,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-
-import androidx.annotation.RequiresApi;
 
 import android.os.Looper;
 import android.os.ResultReceiver;
@@ -177,34 +174,28 @@ public class ScreenRecordService extends Service {
 
                 }
 
-                mMediaRecorder.setOnErrorListener(new MediaRecorder.OnErrorListener() {
-                    @Override
-                    public void onError(MediaRecorder mediaRecorder, int what, int extra) {
-                        if (what == 268435556 && hasMaxFileBeenReached) {
-                            // Benign error b/c recording is too short and has no frames. See SO: https://stackoverflow.com/questions/40616466/mediarecorder-stop-failed-1007
-                            return;
-                        }
-                        Bundle bundle = new Bundle();
-                        bundle.putInt(ERROR_KEY, SETTINGS_ERROR);
-                        bundle.putString(ERROR_REASON_KEY, String.valueOf(what));
-                        setupError(intent, bundle);
-
+                mMediaRecorder.setOnErrorListener((mediaRecorder, what, extra) -> {
+                    if (what == 268435556 && hasMaxFileBeenReached) {
+                        // Benign error b/c recording is too short and has no frames. See SO: https://stackoverflow.com/questions/40616466/mediarecorder-stop-failed-1007
+                        return;
                     }
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(ERROR_KEY, SETTINGS_ERROR);
+                    bundle.putString(ERROR_REASON_KEY, String.valueOf(what));
+                    setupError(intent, bundle);
+
                 });
 
-                mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
-                    @Override
-                    public void onInfo(MediaRecorder mr, int what, int extra) {
-                        if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED) {
-                            hasMaxFileBeenReached = true;
-                            Log.i(TAG, String.format(Locale.US, "onInfoListen what : %d | extra %d", what, extra));
-                            ResultReceiver receiver = intent.getParcelableExtra(ScreenRecordService.BUNDLED_LISTENER);
-                            Bundle bundle = new Bundle();
-                            bundle.putInt(ERROR_KEY, MAX_FILE_SIZE_REACHED_ERROR);
-                            bundle.putString(ERROR_REASON_KEY, getString(R.string.max_file_reached));
-                            if (receiver != null) {
-                                receiver.send(Activity.RESULT_OK, bundle);
-                            }
+                mMediaRecorder.setOnInfoListener((mr, what, extra) -> {
+                    if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED) {
+                        hasMaxFileBeenReached = true;
+                        Log.i(TAG, String.format(Locale.US, "onInfoListen what : %d | extra %d", what, extra));
+                        ResultReceiver receiver = intent.getParcelableExtra(ScreenRecordService.BUNDLED_LISTENER);
+                        Bundle bundle = new Bundle();
+                        bundle.putInt(ERROR_KEY, MAX_FILE_SIZE_REACHED_ERROR);
+                        bundle.putString(ERROR_REASON_KEY, getString(R.string.max_file_reached));
+                        if (receiver != null) {
+                            receiver.send(Activity.RESULT_OK, bundle);
                         }
                     }
                 });
