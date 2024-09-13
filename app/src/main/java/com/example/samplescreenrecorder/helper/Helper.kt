@@ -17,10 +17,22 @@ import java.util.Locale
 object PermissionHelper {
 
     fun checkAudioPermissionGranted(context: Context): Boolean {
-        return ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.RECORD_AUDIO
-        ) == PackageManager.PERMISSION_GRANTED
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED
+                    &&
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.FOREGROUND_SERVICE_MICROPHONE
+                    ) == PackageManager.PERMISSION_GRANTED)
+        } else {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED
+        }
     }
 
     fun checkOverlayPermissionGranted(context: Context): Intent? {
@@ -35,6 +47,73 @@ object PermissionHelper {
         }
     }
 
+    // Helper function to check if rationale should be shown
+    private fun shouldShowRequestPermissionRationale(
+        context: Activity,
+        permission: String
+    ): Boolean {
+        return ActivityCompat.shouldShowRequestPermissionRationale(context, permission)
+    }
+
+    // Helper function to show rationale dialog
+
+fun checkPermissionsForAll(context: Activity): Boolean {
+    val mandatoryPermissions = mutableListOf<String>()
+    val optionalPermissions = mutableListOf<String>()
+
+    // Define permissions based on Android version
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // For Android 13 and above
+        if (!isPermissionGranted(context, Manifest.permission.POST_NOTIFICATIONS)) {
+            mandatoryPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        if (!isPermissionGranted(context, Manifest.permission.RECORD_AUDIO)) {
+            optionalPermissions.add(Manifest.permission.RECORD_AUDIO)
+        }
+        if (!isPermissionGranted(context, Manifest.permission.FOREGROUND_SERVICE_MICROPHONE)) {
+            mandatoryPermissions.add(Manifest.permission.FOREGROUND_SERVICE_MICROPHONE)
+        }
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        // For Android 10 (Q) to Android 12 (S)
+        if (!isPermissionGranted(context, Manifest.permission.RECORD_AUDIO)) {
+            optionalPermissions.add(Manifest.permission.RECORD_AUDIO)
+        }
+    } else {
+        // For Android versions below Q
+        if (!isPermissionGranted(context, Manifest.permission.RECORD_AUDIO)) {
+            optionalPermissions.add(Manifest.permission.RECORD_AUDIO)
+        }
+        if (!isPermissionGranted(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            mandatoryPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+    }
+
+    // Handle mandatory permissions
+    if (mandatoryPermissions.isNotEmpty()) {
+        val showRationale = mandatoryPermissions.any {
+            shouldShowRequestPermissionRationale(context, it)
+        }
+
+        if (showRationale) {
+            // Show rationale dialog to the user
+            showPermissionRationaleDialog(context, mandatoryPermissions)
+        } else {
+            // Request mandatory permissions directly
+            requestPermissions(context, mandatoryPermissions.toTypedArray())
+        }
+        // Return false as we need to wait for the user to grant mandatory permissions
+        return false
+    }
+
+    // Handle optional permissions
+    if (optionalPermissions.isNotEmpty()) {
+        requestPermissions(context, optionalPermissions.toTypedArray())
+    }
+
+    // Return true if no mandatory permissions are needed, or they have been handled
+    return true
+}
+
     // Helper function to check if a permission is granted
     private fun isPermissionGranted(context: Activity, permission: String): Boolean {
         return ContextCompat.checkSelfPermission(
@@ -48,66 +127,6 @@ object PermissionHelper {
         ActivityCompat.requestPermissions(context, permissions, REQUEST_CODE)
     }
 
-    fun checkPermissionsForAll(context: Activity): Boolean {
-        val mandatoryPermissions = mutableListOf<String>()
-        val optionalPermissions = mutableListOf<String>()
-
-        // Define permissions based on Android version
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // For Android 13 and above
-            if (!isPermissionGranted(context, Manifest.permission.POST_NOTIFICATIONS)) {
-                mandatoryPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
-            }
-            if (!isPermissionGranted(context, Manifest.permission.RECORD_AUDIO)) {
-                optionalPermissions.add(Manifest.permission.RECORD_AUDIO)
-            }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // For Android 10 (Q) to Android 12 (S)
-            if (!isPermissionGranted(context, Manifest.permission.RECORD_AUDIO)) {
-                optionalPermissions.add(Manifest.permission.RECORD_AUDIO)
-            }
-        } else {
-            // For Android versions below Q
-            if (!isPermissionGranted(context, Manifest.permission.RECORD_AUDIO)) {
-                optionalPermissions.add(Manifest.permission.RECORD_AUDIO)
-            }
-            if (!isPermissionGranted(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                mandatoryPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-        }
-
-        // Handle mandatory permissions with rationale
-        if (mandatoryPermissions.isNotEmpty()) {
-            val showRationale = mandatoryPermissions.any {
-                shouldShowRequestPermissionRationale(context, it)
-            }
-
-            if (showRationale) {
-                // Show rationale dialog to the user
-                showPermissionRationaleDialog(context, mandatoryPermissions)
-            } else {
-                // Request mandatory permissions directly
-                requestPermissions(context, mandatoryPermissions.toTypedArray())
-            }
-            return mandatoryPermissions.isEmpty() && optionalPermissions.isEmpty()
-        }
-
-        // Request optional permissions directly
-        if (optionalPermissions.isNotEmpty()) {
-            requestPermissions(context, optionalPermissions.toTypedArray())
-        }
-
-        return true
-    }
-
-    // Helper function to check if rationale should be shown
-    private fun shouldShowRequestPermissionRationale(
-        context: Activity,
-        permission: String
-    ): Boolean {
-        return ActivityCompat.shouldShowRequestPermissionRationale(context, permission)
-    }
-
     // Helper function to show rationale dialog
     private fun showPermissionRationaleDialog(
         context: Activity,
@@ -117,6 +136,7 @@ object PermissionHelper {
         val message = permissionsNeeded.joinToString(separator = ", ") { permission ->
             when (permission) {
                 Manifest.permission.POST_NOTIFICATIONS -> "Notification permission"
+                Manifest.permission.RECORD_AUDIO -> "Audio recording permission"
                 Manifest.permission.WRITE_EXTERNAL_STORAGE -> "Storage permission"
                 else -> "Unknown permissions"
             }
@@ -125,7 +145,7 @@ object PermissionHelper {
         // Create the AlertDialog
         val builder = AlertDialog.Builder(context).apply {
             setTitle("Permissions Required")
-            setMessage("The following permissions are required for the app to function properly: $message. Please grant them.")
+            setMessage("The following permissions are required for the app to function properly, Please grant them.")
             setPositiveButton("OK") { _, _ ->
                 // Request permissions when the user clicks "OK"
                 ActivityCompat.requestPermissions(

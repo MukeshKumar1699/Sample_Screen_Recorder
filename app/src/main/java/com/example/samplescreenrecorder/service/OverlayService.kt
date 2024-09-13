@@ -59,7 +59,6 @@ class OverlayService : Service() {
     private var timerRunnable: Runnable? = null
     private var elapsedTime = 0 // Elapsed time in seconds
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         mResultCode = intent!!.getIntExtra("code", -1)
@@ -159,7 +158,7 @@ class OverlayService : Service() {
 
         micIV.apply {
             if (isAudioEnalbed) {
-                micIV.setImageResource(R.drawable.on_mic)
+                micIV.setImageResource(R.drawable.on_mic_green)
             } else {
                 micIV.setImageResource(R.drawable.off_mic)
             }
@@ -199,7 +198,7 @@ class OverlayService : Service() {
 
         windowManager.addView(overlayView, params)
 
-        hbRecorderHelper.setAudioEnable(checkAudioPermissionGranted(this))
+        hbRecorderHelper.setAudioEnable(isAudioEnalbed)
         hbRecorderHelper.startRecordingScreen(mResultData, mResultCode)
         startTimer()
 

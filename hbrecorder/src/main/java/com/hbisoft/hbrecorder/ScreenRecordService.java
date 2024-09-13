@@ -250,7 +250,7 @@ public class ScreenRecordService extends Service {
 */
             notification = new Notification.Builder(getApplicationContext(), channelId)
                     .setOngoing(true)
-                    .setSmallIcon(R.drawable.icon)
+                    .setSmallIcon(R.drawable.screen_record)
                     .setContentTitle(getString(R.string.stop_recording_notification_title))
                     .build();
 
@@ -409,7 +409,11 @@ public class ScreenRecordService extends Service {
 
     private void startFgs(int notificationId, Notification notificaton) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            startForeground(notificationId, notificaton, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION | ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE);
+            if(isAudioEnabled) {
+                startForeground(notificationId, notificaton, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION | ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE);
+            }else {
+                startForeground(notificationId, notificaton, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
+            }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(notificationId, notificaton, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
         } else {
