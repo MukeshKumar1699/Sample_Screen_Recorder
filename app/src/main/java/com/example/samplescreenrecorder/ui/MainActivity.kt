@@ -2,22 +2,19 @@ package com.example.samplescreenrecorder.ui
 
 import android.app.Activity
 import android.app.ActivityManager
-import android.content.ContentValues
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.samplescreenrecorder.service.OverlayService
 import com.example.samplescreenrecorder.R
 import com.example.samplescreenrecorder.helper.Helper.checkOverlayPermissionGranted
 import com.example.samplescreenrecorder.helper.Helper.checkPermissionsForNotificationAndAudio
+import com.example.samplescreenrecorder.service.OverlayService
 import com.example.samplescreenrecorder.viewmodel.MainViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint

@@ -340,31 +340,7 @@ public class ScreenRecordService extends Service {
         filePath = path + "/" + name + ".mp4";
         fileName = name + ".mp4";
 
-        mMediaRecorder = new MediaRecorder();
-
-        // Set orientation hint if specified
-        if (orientationHint != 400) {
-            mMediaRecorder.setOrientationHint(orientationHint);
-        }
-
-
-        // Configure MediaRecorder
-        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-
-        // Configure audio settings if audio is enabled
-        if (isAudioEnabled) {
-            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-            mMediaRecorder.setAudioEncodingBitRate(128000);
-            mMediaRecorder.setAudioSamplingRate(44100);
-        }
-
-        // Set video properties
-        mMediaRecorder.setVideoSize(mScreenWidth, mScreenHeight);
-        mMediaRecorder.setVideoEncodingBitRate(5 * mScreenWidth * mScreenHeight);
-        mMediaRecorder.setVideoFrameRate(60);
+        setupMediaRecorder();
 
         // Set output file
         if (returnedUri != null) {
@@ -391,6 +367,45 @@ public class ScreenRecordService extends Service {
 
         // Prepare MediaRecorder
         mMediaRecorder.prepare();
+    }
+
+    /**Do not change the order of Initialization**/
+    private void setupMediaRecorder() {
+
+        mMediaRecorder = new MediaRecorder();
+
+        //SetOrientation
+        if (orientationHint != 400) {
+            mMediaRecorder.setOrientationHint(orientationHint);
+        }
+
+        //SetSource
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+        if (isAudioEnabled) {
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+        }
+
+        //SetOutputFormat
+        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+
+        //SetSize
+        mMediaRecorder.setVideoSize(mScreenWidth, mScreenHeight);
+
+        //SetEncoder
+        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+        mMediaRecorder.setVideoEncodingBitRate(5 * mScreenWidth * mScreenHeight);
+        if(isAudioEnabled) {
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            mMediaRecorder.setAudioEncodingBitRate(128000);
+
+        }
+
+        //SetRates
+        mMediaRecorder.setVideoFrameRate(60);
+        if (isAudioEnabled) {
+            mMediaRecorder.setAudioSamplingRate(44100);
+        }
+
     }
 
     private void initVirtualDisplay() {

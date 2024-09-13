@@ -1,6 +1,5 @@
 package com.example.samplescreenrecorder.service
 
-import android.Manifest
 import android.app.Service
 import android.content.Context
 import android.content.Intent
